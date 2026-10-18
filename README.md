@@ -153,6 +153,8 @@ dsh plugin --profile desktop add ./plugin/dsh-journal-panel
 
 装完要**完整重启** DSH（桌面端的注入表在启动时收集，热加载只补 API 不补按钮）。插件只读本机 `127.0.0.1:8765`，不写数据库。细节与回滚见 [plugin/dsh-journal-panel/README.md](plugin/dsh-journal-panel/README.md)。
 
+插件也有独立仓库：**[Hagen121212/dsh-journal-panel](https://github.com/Hagen121212/dsh-journal-panel)**（与这里的目录内容一致，适合单独安装和提 issue）。
+
 ## 配置
 
 `config.toml`（从 `config.example.toml` 复制，已被 `.gitignore` 忽略）：

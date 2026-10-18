@@ -1,5 +1,7 @@
 # dsh-journal-panel
 
+> 这个目录与独立仓库 [Hagen121212/dsh-journal-panel](https://github.com/Hagen121212/dsh-journal-panel) 内容一致；单独立装、提 issue、看版本请走那边。这里是随主项目一起分发的副本。
+
 「思维年轮」的 DSH 轻量面板。在 DSH 右上角放一个「年」按钮，点开后读取本机 `http://127.0.0.1:8765/api/summary`，显示：
 
 - 会话数 / 已确认洞察 / 待确认洞察
