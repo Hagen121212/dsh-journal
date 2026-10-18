@@ -6,6 +6,10 @@
 
 ![概览](docs/screenshots/overview.png)
 
+![30 秒导览](docs/demo.gif)
+
+> 导览用的是合成演示库（`tools/build_demo.py`），不含任何真实聊天记录；生成方式见 `tools/make_demo_gif.py`。
+
 ## 它解决什么问题
 
 大多数“聊天总结”工具给你一段摘要，看完就没了。真正难的是：

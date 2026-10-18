@@ -17,6 +17,7 @@ FACT.md
 # ---- build / tooling ----
 .edge-profile/
 .tools/
+docs/frames/
 tests/_tmp/
 __pycache__/
 *.py[cod]
