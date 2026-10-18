@@ -1,0 +1,35 @@
+# 复制为 config.toml 后按需修改（config.toml 不会进仓库）。
+# 所有字段都有默认值；这里列出的都是可以省掉的。
+
+[paths]
+# 数据、报告、日志的根目录；默认 ~/DeepSeekJournal
+# home = "~/DeepSeekJournal"
+# DSH 的数据目录，里面应有 sessions/ 与 .credentials.yaml；默认 ~/.dsh
+# dsh_home = "~/.dsh"
+
+[model]
+base_url = "https://api.deepseek.com"
+model = "deepseek-flash"
+reasoning_effort = "low"        # low | medium | high
+max_output_tokens = 24000
+temperature = 0.2
+timeout_seconds = 180
+# api_key_env = "DEEPSEEK_API_KEY"
+
+[budget]
+# 单次运行的护栏：超过就停，不会悄悄烧钱
+max_calls_per_run = 120
+max_total_tokens_per_run = 3000000
+
+[schedule]
+weekly_day = "SUN"
+weekly_time = "20:00"
+growth_interval_days = 14        # 实际判定用 13 天，避免周日任务漂移到第三周
+timezone = "Asia/Shanghai"
+
+[privacy]
+redact_paths = true              # 入库前替换本机用户路径
+store_raw_copy = false           # 不保留解压后的原始转录
+
+# 一级分类；留空则用内置的 8 类
+# taxonomy = ["技术实现", "产品需求", "研究方法", "决策规划", "表达写作", "协作沟通", "元讨论", "未归类"]

@@ -1,0 +1,4 @@
+{"type":"session","id":"s2","cwd":"/home/demo/project","createdAt":1700000100000,"time":1700000100000}
+{"type":"user/message","seq":1,"time":1700000101000,"data":{"message":{"id":"u1","role":"user","source":{"kind":"user"},"content":[{"type":"text","text":"这条消息之前的 JSON 是坏的。"}]}}}
+not json at all
+{"type":"session/title","data":{"title":"坏行测试","source":{"kind":"model"}}}

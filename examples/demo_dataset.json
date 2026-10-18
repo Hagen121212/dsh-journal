@@ -1,0 +1,380 @@
+{
+  "meta": {
+    "title": "思维年轮演示数据",
+    "note": "全部为合成内容：人名、项目、数字均属虚构，仅用于演示界面与测试。",
+    "generated_for": "docs/screenshots"
+  },
+  "sessions": [
+    {
+      "id": "demo-001",
+      "title": "给命令行工具加 --dry-run",
+      "date": "2026-10-12",
+      "start_time": "10:04",
+      "model": "deepseek-flash",
+      "topics": [
+        {"name": "CLI 设计", "parent": "技术实现", "confidence": 0.9},
+        {"name": "副作用与可逆性", "parent": "技术实现", "confidence": 0.7}
+      ],
+      "messages": [
+        {"role": "user", "id": "u1", "text": "我想给这个命令行工具加一个 --dry-run，先别改代码，帮我想清楚它到底应该影响哪些操作。"},
+        {"role": "assistant", "id": "a1", "text": "先把有副作用的操作列出来：删除文件、覆盖写入、重命名、创建目录、调用外部命令。dry-run 的最小定义是“不改变磁盘和外部状态”，所以判断标准可以是：这一次操作是否会产生不可逆的副作用。"},
+        {"role": "user", "id": "u2", "text": "删除和覆盖肯定算，重命名算不算？我倾向上只覆盖会丢数据的操作，不然心智负担太大。"},
+        {"role": "assistant", "id": "a2", "text": "按这个标准，重命名可以排除：它可逆，也不丢内容。规则就收敛成一句话——只有可能丢数据的操作才进 dry-run。代价是以后新增操作时要逐个判断。"},
+        {"role": "user", "id": "u3", "text": "那就先只处理删除和覆盖，写一个判定表我看看，别急着扩展。"},
+        {"role": "assistant", "id": "a3", "text": "判定表按“操作类型 / 是否可逆 / 是否丢数据 / 是否纳入 dry-run”四列写，先覆盖删除和覆盖两种，其余标为“暂不纳入”，留出以后扩展的位置。"}
+      ],
+      "card": {
+        "summary": "在给 CLI 加 --dry-run 时，先把范围收窄成“只覆盖会丢数据的操作”，再用判定表把规则固定下来。讨论的重点不是功能多少，而是判断标准能否一句话说清。",
+        "goal": "定义 dry-run 的最小语义与适用范围，避免功能膨胀。",
+        "key_turns": [
+          {"description": "把 dry-run 的判断标准改成“是否可逆 + 是否丢数据”", "quote": "我倾向上只覆盖会丢数据的操作，不然心智负担太大。", "message_id": "demo-001:user:u2", "why_it_matters": "从列举功能转为给出可复用的判定标准"}
+        ],
+        "conclusions": ["只有可能丢数据的操作才纳入 dry-run", "重命名不纳入，因为它可逆且不丢内容"],
+        "open_loops": ["判定表写好之后，是否扩展到大文件移动还没有结论"],
+        "signals": {
+          "decision": [
+            {"observation": "用维护成本（心智负担）作为取舍标准，而不只是功能完整性", "quote": "我倾向上只覆盖会丢数据的操作，不然心智负担太大。", "message_id": "demo-001:user:u2"}
+          ],
+          "research": [
+            {"observation": "主动追问边界情况（重命名算不算），而不是接受第一版结论", "quote": "删除和覆盖肯定算，重命名算不算？", "message_id": "demo-001:user:u2"}
+          ]
+        },
+        "self_statements": [],
+        "corrections": [],
+        "commitments": [
+          {"commitment": "先写判定表，再决定是否扩展", "status": "unknown", "quote": "那就先只处理删除和覆盖，写一个判定表我看看，别急着扩展。", "message_id": "demo-001:user:u3"}
+        ],
+        "memorable_quote": {"text": "先别改代码，帮我想清楚它到底应该影响哪些操作。", "message_id": "demo-001:user:u1", "why": "把“先定标准”放在了“先写实现”之前"}
+      }
+    },
+    {
+      "id": "demo-002",
+      "title": "选一个能长期维护的文档站生成器",
+      "date": "2026-10-14",
+      "start_time": "15:20",
+      "model": "deepseek-flash",
+      "topics": [
+        {"name": "构建工具选型", "parent": "决策规划", "confidence": 0.9},
+        {"name": "升级成本", "parent": "决策规划", "confidence": 0.6}
+      ],
+      "messages": [
+        {"role": "user", "id": "u1", "text": "A 和 B 都能生成文档站，我想选一个能长期维护的。先帮我列判断标准，不要直接推荐。"},
+        {"role": "assistant", "id": "a1", "text": "可以用的标准有：升级破坏性、插件生态、构建速度、主题定制成本、社区活跃度、迁移出走的代价。不同标准权重不一样，取决于你未来两年更可能遇到哪一种变化。"},
+        {"role": "user", "id": "u2", "text": "构建速度我其实不敏感，我更在意插件生态和升级的破坏性。"},
+        {"role": "assistant", "id": "a2", "text": "那判断标准就收窄成两条。生态看的是“我需要的能力有没有人维护”，升级破坏性看的是“一次大版本要改几处配置和自定义代码”。后者可以用一次真实升级来测。"},
+        {"role": "user", "id": "u3", "text": "那先各跑一个最小站点，记录升级一次要改几处，两周后再定。"},
+        {"role": "assistant", "id": "a3", "text": "最小站点里放三个最容易受影响的点：自定义主题、代码高亮、搜索。升级前后各记一次改动位置和耗时，两周后就有可比较的证据，而不是凭印象。"}
+      ],
+      "card": {
+        "summary": "在 A、B 两个文档站生成器之间不直接选，而是先把判断标准从六个收窄到两个，再设计一个两周内可完成的最小对比实验。",
+        "goal": "用可比较的证据决定长期使用哪个生成器。",
+        "key_turns": [
+          {"description": "主动排除自己不敏感的维度", "quote": "构建速度我其实不敏感，我更在意插件生态和升级的破坏性。", "message_id": "demo-002:user:u2", "why_it_matters": "把开放式的选型问题变成一个可比较的两维问题"}
+        ],
+        "conclusions": ["判断标准收窄为插件生态与升级破坏性", "用最小站点实测升级改动量，而不是看文档"],
+        "open_loops": ["两周后的实测结果尚未产生", "迁移出走的代价还没有评估"],
+        "signals": {
+          "research": [
+            {"observation": "要求先给判断标准，再给推荐，避免被结论牵着走", "quote": "先帮我列判断标准，不要直接推荐。", "message_id": "demo-002:user:u1"}
+          ],
+          "decision": [
+            {"observation": "用“我更在意什么”显式给权重，缩小比较范围", "quote": "构建速度我其实不敏感，我更在意插件生态和升级的破坏性。", "message_id": "demo-002:user:u2"}
+          ]
+        },
+        "self_statements": [],
+        "corrections": [],
+        "commitments": [
+          {"commitment": "各跑一个最小站点并记录升级改动", "status": "unknown", "quote": "先各跑一个最小站点，记录升级一次要改几处，两周后再定。", "message_id": "demo-002:user:u3"}
+        ],
+        "memorable_quote": {"text": "先帮我列判断标准，不要直接推荐。", "message_id": "demo-002:user:u1", "why": "先要标准再要结论，是这段对话的基调"}
+      }
+    },
+    {
+      "id": "demo-003",
+      "title": "周报怎么写才不像流水账",
+      "date": "2026-10-16",
+      "start_time": "09:12",
+      "model": "deepseek-flash",
+      "topics": [
+        {"name": "写作结构", "parent": "表达写作", "confidence": 0.85},
+        {"name": "周报与复盘节奏", "parent": "表达写作", "confidence": 0.6}
+      ],
+      "messages": [
+        {"role": "user", "id": "u1", "text": "我每周写的周报都是流水账，怎么改成能看出判断的？"},
+        {"role": "assistant", "id": "a1", "text": "流水账的根因是只记录“做了什么”，没有记录“为什么这样选”。可以加两栏：这周放弃了什么、为什么放弃；哪个判断现在还不确定。这两栏最能暴露思考。"},
+        {"role": "user", "id": "u2", "text": "所以重点不是列做了几件事，而是写清楚这周放弃了什么、为什么放弃？"},
+        {"role": "assistant", "id": "a2", "text": "对。完成的清单别人可以自己看任务板，周报真正稀缺的是取舍理由和还悬着的不确定。写法上每栏两三句就够，写长了又会变回流水账。"},
+        {"role": "user", "id": "u3", "text": "先按这个结构写两周，如果还是流水账就换回原来的模板。"},
+        {"role": "assistant", "id": "a3", "text": "可以设一个判断标准：两周后回看，如果每篇里至少有一句是你现在仍然认同的取舍理由，就算这个结构有效；否则换模板。"}
+      ],
+      "card": {
+        "summary": "把周报从“任务清单”改成“取舍记录”，并给这个改法设了一个两周后可检验的判断标准。",
+        "goal": "让周报承载判断，而不只是任务完成度。",
+        "key_turns": [
+          {"description": "把周报的核心问题重新定义为“记录取舍”", "quote": "所以重点不是列做了几件事，而是写清楚这周放弃了什么、为什么放弃？", "message_id": "demo-003:user:u2", "why_it_matters": "从格式问题变成目的问题"}
+        ],
+        "conclusions": ["周报应记录取舍理由与未决的不确定", "两周后用一个可检验的标准决定是否继续"],
+        "open_loops": ["两周试用期尚未结束"],
+        "signals": {
+          "logic_language": [
+            {"observation": "用自己的话复述并确认对方的结论，而不是直接接受", "quote": "所以重点不是列做了几件事，而是写清楚这周放弃了什么、为什么放弃？", "message_id": "demo-003:user:u2"}
+          ]
+        },
+        "self_statements": [
+          {"statement": "写东西容易堆事实，不太写判断", "quote": "我每周写的周报都是流水账", "message_id": "demo-003:user:u1"}
+        ],
+        "corrections": [],
+        "commitments": [
+          {"commitment": "按新结构写两周周报", "status": "unknown", "quote": "先按这个结构写两周，如果还是流水账就换回原来的模板。", "message_id": "demo-003:user:u3"}
+        ],
+        "memorable_quote": {"text": "先按这个结构写两周，如果还是流水账就换回原来的模板。", "message_id": "demo-003:user:u3", "why": "给方法设了退出条件"}
+      }
+    },
+    {
+      "id": "demo-004",
+      "title": "先把构建时间花在哪测出来",
+      "date": "2026-10-20",
+      "start_time": "11:40",
+      "model": "deepseek-flash",
+      "topics": [
+        {"name": "构建性能", "parent": "技术实现", "confidence": 0.9},
+        {"name": "测量先于优化", "parent": "研究方法", "confidence": 0.7}
+      ],
+      "messages": [
+        {"role": "user", "id": "u1", "text": "构建要 40 秒，我想先测清楚时间花在哪，再决定优化什么，别凭感觉。"},
+        {"role": "assistant", "id": "a1", "text": "可以先拆三段：依赖解析、编译、产物压缩。每段加一个计时埋点，跑五次取中位数，比只看总时长更容易定位。"},
+        {"role": "user", "id": "u2", "text": "缓存命中率比并行度更值得先看？我原以为并行度是瓶颈。"},
+        {"role": "assistant", "id": "a2", "text": "如果五次里波动很大，说明瓶颈可能在缓存或磁盘，而不是 CPU 并行。先看命中率和各段方差，再决定要不要动并行度。"},
+        {"role": "user", "id": "u3", "text": "那先加一个计时埋点，拿到三个阶段的数据再说。"},
+        {"role": "assistant", "id": "a3", "text": "埋点只记三段耗时和一个总耗时，先不引入统计库。跑完五次后把中位数和方差写进 issue，再讨论优化顺序。"}
+      ],
+      "card": {
+        "summary": "面对 40 秒构建时间，先拒绝凭感觉优化，改为先埋点测量、再按数据决定顺序，并修正了自己对瓶颈的假设。",
+        "goal": "用测量数据定位构建瓶颈。",
+        "key_turns": [
+          {"description": "推翻自己“并行度是瓶颈”的假设", "quote": "缓存命中率比并行度更值得先看？我原以为并行度是瓶颈。", "message_id": "demo-004:user:u2", "why_it_matters": "主动质疑自己的先验假设，并用数据验证"}
+        ],
+        "conclusions": ["先测三段耗时与方差，再决定优化什么"],
+        "open_loops": ["五次测量数据还没拿到"],
+        "signals": {
+          "technical": [
+            {"observation": "把“先测量”放在“先优化”之前", "quote": "我想先测清楚时间花在哪，再决定优化什么，别凭感觉。", "message_id": "demo-004:user:u1"}
+          ],
+          "cognition": [
+            {"observation": "明确说出自己原来的假设，并请对方检验", "quote": "我原以为并行度是瓶颈。", "message_id": "demo-004:user:u2"}
+          ]
+        },
+        "self_statements": [],
+        "corrections": [
+          {"from": "并行度是瓶颈", "to": "先看缓存命中率与各段方差", "quote": "我原以为并行度是瓶颈。", "message_id": "demo-004:user:u2"}
+        ],
+        "commitments": [
+          {"commitment": "加计时埋点并跑五次", "status": "unknown", "quote": "那先加一个计时埋点，拿到三个阶段的数据再说。", "message_id": "demo-004:user:u3"}
+        ],
+        "memorable_quote": {"text": "我想先测清楚时间花在哪，再决定优化什么，别凭感觉。", "message_id": "demo-004:user:u1", "why": "把测量放在优化之前"}
+      }
+    },
+    {
+      "id": "demo-005",
+      "title": "破坏性变更的说明该按什么顺序写",
+      "date": "2026-10-22",
+      "start_time": "16:05",
+      "model": "deepseek-flash",
+      "topics": [
+        {"name": "技术写作", "parent": "表达写作", "confidence": 0.85},
+        {"name": "变更沟通", "parent": "协作沟通", "confidence": 0.6}
+      ],
+      "messages": [
+        {"role": "user", "id": "u1", "text": "下周要发一个破坏性变更，我想写一份说明，先让读者知道要改什么，再解释为什么。"},
+        {"role": "assistant", "id": "a1", "text": "读者最关心的是“我会不会坏、要改几行”。可以把说明拆成影响范围、迁移步骤、原因三块，原因放最后，前两块尽量短。"},
+        {"role": "user", "id": "u2", "text": "顺序你建议先给迁移步骤还是先给影响范围？我担心读者直接跳过原因。"},
+        {"role": "assistant", "id": "a2", "text": "先给影响范围，读者三十秒内能判断“与我无关”还是“我要动手”；需要动手的人自然会往下看步骤。原因放最后，不会挡住迁移。"},
+        {"role": "user", "id": "u3", "text": "就按“影响范围—迁移步骤—原因”写，原因放最后，愿意看的人再看。"},
+        {"role": "assistant", "id": "a3", "text": "开头再加一句“这次变更是破坏性的”，以及一个迁移前后对比的最小例子。三块之外不再加背景介绍，避免把关键动作埋掉。"}
+      ],
+      "card": {
+        "summary": "为破坏性变更说明确定了“影响范围—迁移步骤—原因”的信息顺序，按读者的决策路径而不是按作者的解释欲望排序。",
+        "goal": "让读者尽快判断自己是否受影响，并能完成迁移。",
+        "key_turns": [
+          {"description": "按读者决策路径确定信息顺序", "quote": "顺序你建议先给迁移步骤还是先给影响范围？我担心读者直接跳过原因。", "message_id": "demo-005:user:u2", "why_it_matters": "从“我想解释什么”转向“读者先要判断什么”"}
+        ],
+        "conclusions": ["先影响范围，再迁移步骤，最后原因"],
+        "open_loops": ["说明文档尚未动笔"],
+        "signals": {
+          "logic_language": [
+            {"observation": "用读者可能的跳过行为来检验结构", "quote": "我担心读者直接跳过原因。", "message_id": "demo-005:user:u2"}
+          ],
+          "decision": [
+            {"observation": "接受一个明确的排序规则并落成结构", "quote": "就按“影响范围—迁移步骤—原因”写，原因放最后，愿意看的人再看。", "message_id": "demo-005:user:u3"}
+          ]
+        },
+        "self_statements": [],
+        "corrections": [],
+        "commitments": [
+          {"commitment": "按三段结构写变更说明", "status": "unknown", "quote": "就按“影响范围—迁移步骤—原因”写，原因放最后，愿意看的人再看。", "message_id": "demo-005:user:u3"}
+        ],
+        "memorable_quote": {"text": "先让读者知道要改什么，再解释为什么。", "message_id": "demo-005:user:u1", "why": "把读者动作放在作者解释之前"}
+      }
+    }
+  ],
+  "insights": [
+    {
+      "kind": "question_style",
+      "statement": "在这批对话里，你倾向先给约束和目标，再要方案，很少直接要一个结论。",
+      "confidence": "high",
+      "status": "accepted",
+      "date": "2026-10-18",
+      "evidence": [
+        {"session_id": "demo-001", "message_id": "demo-001:user:u1", "quote": "先别改代码，帮我想清楚它到底应该影响哪些操作。"},
+        {"session_id": "demo-002", "message_id": "demo-002:user:u1", "quote": "先帮我列判断标准，不要直接推荐。"}
+      ]
+    },
+    {
+      "kind": "strength",
+      "statement": "在这批对话里，你会用“缩小范围”换取可验证性：先只做删除和覆盖，再谈扩展。",
+      "confidence": "medium",
+      "status": "accepted",
+      "date": "2026-10-18",
+      "evidence": [
+        {"session_id": "demo-001", "message_id": "demo-001:user:u3", "quote": "那就先只处理删除和覆盖，写一个判定表我看看，别急着扩展。"}
+      ]
+    },
+    {
+      "kind": "pattern",
+      "statement": "在这批对话里，你选工具时先排除自己不敏感的维度，再集中比较两三个关键差异。",
+      "confidence": "medium",
+      "status": "accepted",
+      "date": "2026-10-25",
+      "evidence": [
+        {"session_id": "demo-002", "message_id": "demo-002:user:u2", "quote": "构建速度我其实不敏感，我更在意插件生态和升级的破坏性。"}
+      ]
+    },
+    {
+      "kind": "blind_spot",
+      "statement": "在这批对话里，你倾向用“先试两周”把判断推迟到以后。",
+      "confidence": "low",
+      "status": "rejected",
+      "date": "2026-10-18",
+      "evidence": [
+        {"session_id": "demo-003", "message_id": "demo-003:user:u3", "quote": "先按这个结构写两周，如果还是流水账就换回原来的模板。"}
+      ]
+    },
+    {
+      "kind": "note",
+      "statement": "「按新结构写两周」来自同事给的建议，不是你自己提出的方法。",
+      "original_statement": "在这批对话里，你倾向用短期试验代替判断。",
+      "confidence": "low",
+      "status": "accepted",
+      "date": "2026-10-18",
+      "evidence": [
+        {"session_id": "demo-003", "message_id": "demo-003:user:u1", "quote": "我每周写的周报都是流水账，怎么改成能看出判断的？"}
+      ]
+    }
+  ],
+  "reports": [
+    {
+      "kind": "baseline",
+      "period_start": "2026-10-12",
+      "period_end": "2026-10-18",
+      "title": "基线画像：2026-10-12 至 2026-10-18",
+      "data": {
+        "period_summary": "这是第一次全量回看，覆盖三段对话：给 CLI 定 dry-run 的范围、给文档站选型定判断标准、把周报从任务清单改成取舍记录。三次都在把模糊问题收窄成可检验的小步骤。",
+        "dimensions": {
+          "技术判断力": {"score": null, "confidence": "low", "rationale": "dry-run 的范围讨论里出现了可逆性与数据丢失的判断，但样本只有一次。", "evidence": [{"session_id": "demo-001", "message_id": "demo-001:user:u2", "quote": "我倾向上只覆盖会丢数据的操作，不然心智负担太大。"}], "counter_evidence": "暂未发现", "change": "no_baseline"},
+          "决策质量": {"score": null, "confidence": "low", "rationale": "选型时主动给出权重并排除不敏感维度。", "evidence": [{"session_id": "demo-002", "message_id": "demo-002:user:u2", "quote": "构建速度我其实不敏感，我更在意插件生态和升级的破坏性。"}], "counter_evidence": "两周后的实测结果尚未出现，无法判断这个取舍是否正确。", "change": "no_baseline"},
+          "研究方法": {"score": null, "confidence": "low", "rationale": "提出用最小站点实测升级改动量，方向对，但还没执行。", "evidence": [{"session_id": "demo-002", "message_id": "demo-002:user:u3", "quote": "先各跑一个最小站点，记录升级一次要改几处，两周后再定。"}], "counter_evidence": "暂未执行，谈不上方法是否有效。", "change": "no_baseline"},
+          "逻辑语言能力": {"score": null, "confidence": "low", "rationale": "会用复述来确认理解，并给方法设退出条件。", "evidence": [{"session_id": "demo-003", "message_id": "demo-003:user:u2", "quote": "所以重点不是列做了几件事，而是写清楚这周放弃了什么、为什么放弃？"}], "counter_evidence": "暂未发现", "change": "no_baseline"},
+          "思维认知方式": {"score": null, "confidence": "low", "rationale": "讨论停留在具体问题层面，尚未看到跨话题的框架迁移。", "evidence": [{"session_id": "demo-001", "message_id": "demo-001:user:u1", "quote": "先别改代码，帮我想清楚它到底应该影响哪些操作。"}], "counter_evidence": "样本太少，不下结论。", "change": "no_baseline"}
+        },
+        "recurring_patterns": [],
+        "gaps": [],
+        "insights": [],
+        "insight_updates": [],
+        "experiment": {"title": "把两个决定各写成一个可验证的小实验", "why": "两份讨论都停在方案层，还没有数据。", "how": "dry-run 写判定表；选型各跑一个最小站点并记录升级改动。", "done_when": "两份结果都能用一句话说出结论。"}
+      }
+    },
+    {
+      "kind": "weekly",
+      "period_start": "2026-10-12",
+      "period_end": "2026-10-18",
+      "title": "2026-W42 周报（2026-10-12 至 2026-10-18）",
+      "data": {
+        "one_line": "这周把两个模糊问题都收窄成了可验证的小实验：dry-run 只覆盖会丢数据的操作，选型先各跑一个最小站点。",
+        "threads": [
+          {"topic": "把范围收窄成规则", "summary": "dry-run 从功能清单变成“只处理会丢数据的操作”，并用判定表固定。", "session_ids": ["demo-001"]},
+          {"topic": "先定标准再选型", "summary": "文档站选型先列六个标准，再按权重收窄到两个，最后设计两周实测。", "session_ids": ["demo-002"]},
+          {"topic": "写作承载判断", "summary": "周报从任务清单改成取舍记录，并设了两周后的退出条件。", "session_ids": ["demo-003"]}
+        ],
+        "turns": [
+          {"description": "把 dry-run 的判断标准换成“可逆 + 丢数据”", "quote": "我倾向上只覆盖会丢数据的操作，不然心智负担太大。", "session_id": "demo-001", "message_id": "demo-001:user:u2", "why": "从列举功能转为给出可复用的判定标准"},
+          {"description": "主动排除不敏感的选型维度", "quote": "构建速度我其实不敏感，我更在意插件生态和升级的破坏性。", "session_id": "demo-002", "message_id": "demo-002:user:u2", "why": "把开放问题变成两维比较"}
+        ],
+        "open_loops": ["两个两周实验都还没有结果", "判定表尚未动笔"],
+        "last_experiment": {"status": "none", "evidence": "首次周报，没有上周实验可对照。"},
+        "lookback": {"quote": "先别改代码，帮我想清楚它到底应该影响哪些操作。", "session_id": "demo-001", "message_id": "demo-001:user:u1", "why": "这周三次讨论都用了同一个动作：先定标准，再动实现。"},
+        "next_experiment": {"title": "把 dry-run 的判定表写出来", "how": "四列：操作类型 / 是否可逆 / 是否丢数据 / 是否纳入。", "done_when": "表格能覆盖删除、覆盖，并明确其余操作暂不纳入的理由。"}
+      }
+    },
+    {
+      "kind": "weekly",
+      "period_start": "2026-10-19",
+      "period_end": "2026-10-25",
+      "title": "2026-W43 周报（2026-10-19 至 2026-10-25）",
+      "data": {
+        "one_line": "这周先测后改：构建优化先拿三个阶段的数据，对外说明先定住“影响范围—迁移步骤—原因”的顺序。",
+        "threads": [
+          {"topic": "测量先于优化", "summary": "40 秒构建没有直接改并行度，而是先加计时埋点、跑五次取中位数。", "session_ids": ["demo-004"]},
+          {"topic": "按读者的决策路径写作", "summary": "破坏性变更说明按影响范围、迁移步骤、原因排序。", "session_ids": ["demo-005"]}
+        ],
+        "turns": [
+          {"description": "推翻自己“并行度是瓶颈”的假设", "quote": "我原以为并行度是瓶颈。", "session_id": "demo-004", "message_id": "demo-004:user:u2", "why": "先承认假设，再用数据检验"},
+          {"description": "按读者会跳过什么来排信息顺序", "quote": "我担心读者直接跳过原因。", "session_id": "demo-005", "message_id": "demo-005:user:u2", "why": "结构由读者行为决定，而不是作者想解释什么"}
+        ],
+        "open_loops": ["五个阶段的测量数据还没回来", "变更说明还没动笔"],
+        "last_experiment": {"status": "partial", "evidence": "判定表写了两行（删除、覆盖），其余操作还没有写暂不纳入的理由。"},
+        "lookback": {"quote": "我想先测清楚时间花在哪，再决定优化什么，别凭感觉。", "session_id": "demo-004", "message_id": "demo-004:user:u1", "why": "上周的“先定标准”这周变成了“先拿数据”，是同一个习惯的延续。"},
+        "next_experiment": {"title": "把构建三阶段的数据写进 issue", "how": "五次运行的中位数与方差，各阶段一行。", "done_when": "issue 里能指出占比最高的一段，并说明下一步动它还是不动。"}
+      }
+    },
+    {
+      "kind": "growth",
+      "period_start": "2026-10-19",
+      "period_end": "2026-10-25",
+      "title": "成长复盘：2026-10-19 至 2026-10-25",
+      "data": {
+        "period_summary": "这一期只有两段对话，但都出现了同一种转向：从“先做点什么”变成“先拿到能判断的依据”。构建优化先埋点测量，变更说明先确定读者的判断顺序。上周的两个实验只推进了一半。",
+        "dimensions": {
+          "技术判断力": {"score": 3, "confidence": "medium", "rationale": "能把性能问题拆成可测量的三段，并主动质疑自己的瓶颈假设。", "evidence": [{"session_id": "demo-004", "message_id": "demo-004:user:u1", "quote": "我想先测清楚时间花在哪，再决定优化什么，别凭感觉。"}], "counter_evidence": "测量尚未执行，判断仍停在计划层。", "change": "上一期只有 dry-run 一个样本，本期首次出现明确的测量设计"},
+          "决策质量": {"score": 3, "confidence": "medium", "rationale": "先用数据决定优化顺序，再谈方案；对外说明也先确定读者判断路径。", "evidence": [{"session_id": "demo-004", "message_id": "demo-004:user:u2", "quote": "缓存命中率比并行度更值得先看？我原以为并行度是瓶颈。"}], "counter_evidence": "上周选型的实测结果仍未出现，决策闭环偏慢。", "change": "比上周更倾向先用证据再看选项"},
+          "研究方法": {"score": 2, "confidence": "medium", "rationale": "提出了埋点与五次取中位数的设计，但没有定义成功阈值。", "evidence": [{"session_id": "demo-004", "message_id": "demo-004:user:u3", "quote": "那先加一个计时埋点，拿到三个阶段的数据再说。"}], "counter_evidence": "上周的最小站点实测没有执行，方法停留在设计。", "change": "设计更具体，但执行率仍是短板"},
+          "逻辑语言能力": {"score": 3, "confidence": "medium", "rationale": "写作时按读者的判断顺序组织信息，而不是按自己的解释顺序。", "evidence": [{"session_id": "demo-005", "message_id": "demo-005:user:u3", "quote": "就按“影响范围—迁移步骤—原因”写，原因放最后，愿意看的人再看。"}], "counter_evidence": "暂未发现反例。", "change": "首次出现以读者行为为约束的结构选择"},
+          "思维认知方式": {"score": 3, "confidence": "low", "rationale": "开始主动暴露并修正自己的先验假设。", "evidence": [{"session_id": "demo-004", "message_id": "demo-004:user:u2", "quote": "我原以为并行度是瓶颈。"}], "counter_evidence": "样本只有两段对话，还不足以判断是否稳定。", "change": "上周未观察到，本期出现一次明确的自证伪动作"}
+        },
+        "recurring_patterns": [
+          {"pattern": "先确定判断标准，再开始动手", "occurrences": 3, "evidence": [
+            {"session_id": "demo-001", "message_id": "demo-001:user:u1", "quote": "先别改代码，帮我想清楚它到底应该影响哪些操作。"},
+            {"session_id": "demo-002", "message_id": "demo-002:user:u1", "quote": "先帮我列判断标准，不要直接推荐。"}
+          ]}
+        ],
+        "gaps": [
+          {"stated": "先测再优化", "enacted": "埋点还没加，数据还没跑。", "evidence": [{"session_id": "demo-004", "message_id": "demo-004:user:u3", "quote": "那先加一个计时埋点，拿到三个阶段的数据再说。"}]}
+        ],
+        "insights": [],
+        "insight_updates": [
+          {"statement": "在这批对话里，你倾向先给约束和目标，再要方案，很少直接要一个结论。", "verdict": "confirmed", "note": "本期两段对话仍然先给约束：先测再优化、先定读者顺序。", "evidence": [{"session_id": "demo-004", "message_id": "demo-004:user:u1", "quote": "我想先测清楚时间花在哪，再决定优化什么，别凭感觉。"}]},
+          {"statement": "在这批对话里，你会用“缩小范围”换取可验证性：先只做删除和覆盖，再谈扩展。", "verdict": "weakened", "note": "本期范围没有继续收窄，反而先展开了测量设计。", "evidence": [{"session_id": "demo-004", "message_id": "demo-004:user:u2", "quote": "缓存命中率比并行度更值得先看？我原以为并行度是瓶颈。"}]},
+          {"statement": "在这批对话里，你选工具时先排除自己不敏感的维度，再集中比较两三个关键差异。", "verdict": "insufficient", "note": "本期没有新的选型对话，无法复核。", "evidence": []}
+        ],
+        "experiment": {"title": "给出一个阈值再开始测量", "why": "研究方法的短板是设计了实验却不定成功标准。", "how": "在埋点之前先写一行：三段中哪一段占比超过 50%，就优先动它。", "done_when": "issue 里有这一行，并且五次数据回来后再看它是否被推翻。"},
+        "old_dialogue": {"session_id": "demo-001", "then": "先定 dry-run 的规则，再写代码。", "now": "先定测量的分段和阈值，再动构建配置。", "what_changed": "从“先定规则”扩展到“先定证据标准”，动作一致，对象变了。"}
+      }
+    },
+    {
+      "kind": "l4",
+      "period_start": "2026-10-26",
+      "period_end": "2026-10-26",
+      "title": "L4 档案：已确认的自我认知",
+      "data": {}
+    }
+  ]
+}

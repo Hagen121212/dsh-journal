@@ -1,0 +1,35 @@
+# ---- local data: never commit ----
+data/
+reports/
+logs/
+backups/
+demo-home/
+*.db
+*.db-wal
+*.db-shm
+*.log
+config.toml
+api_key.txt
+.env
+.credentials.yaml
+FACT.md
+
+# ---- build / tooling ----
+.edge-profile/
+.tools/
+tests/_tmp/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+
+# ---- editors / OS ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini

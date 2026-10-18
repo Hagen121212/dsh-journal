@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>DSH 面板预览 · 思维年轮</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #f4f2ec; color: #20242a;
+    font: 14px/1.6 "Segoe UI", "Microsoft YaHei", system-ui, sans-serif; }
+  .caption { position: fixed; left: 40px; top: 36px; max-width: 520px; color: #5d6259; }
+  .caption h1 { font-size: 16px; margin: 0 0 8px; color: #20242a; }
+  .caption p { margin: 0 0 6px; }
+  .caption code { background: #e9e5da; padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="caption">
+  <h1>DSH 右上角「年」面板</h1>
+  <p>点开后读取本机 journal API，只做“大概”，完整内容仍走网页。</p>
+  <p>本图由插件真实的 <code>client.js</code> 渲染，数据来自合成演示库。</p>
+</div>
+<script>
+  // 必须在 client.js 之前设置：插件在加载时读取这个地址。
+  // 8766 是 tools/build_demo.py 生成的合成演示服务，仅用于截图。
+  window.__DSH_JOURNAL_API__ = "http://127.0.0.1:8766";
+  // 让面板在加载后自动展开（插件用这个 key 记忆展开状态）。
+  try { localStorage.setItem("dsh-journal-open", "1"); } catch (e) {}
+</script>
+<script src="../plugin/dsh-journal-panel/lib/client.js"></script>
+<script>
+  // 若 localStorage 不可用（例如 file:// 受限），退化成点一下按钮。
+  setTimeout(function () {
+    var panel = document.getElementById("dsh-journal-panel");
+    var fab = document.getElementById("dsh-journal-fab");
+    if (panel && fab && !panel.classList.contains("open")) fab.click();
+  }, 200);
+</script>
+</body>
+</html>

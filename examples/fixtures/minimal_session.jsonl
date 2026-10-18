@@ -1,0 +1,9 @@
+{"type":"session","id":"s1","cwd":"/home/demo/project","createdAt":1700000000000,"time":1700000000000}
+{"type":"session/title","data":{"title":"测试会话","source":{"kind":"model"}}}
+{"type":"model/selection","data":{"model":"deepseek-flash"}}
+{"type":"turn/start","seq":1,"time":1700000001000,"data":{"turn":1}}
+{"type":"user/message","seq":2,"time":1700000002000,"data":{"message":{"id":"u1","role":"user","source":{"kind":"user"},"content":[{"type":"text","text":"第一个问题：这个函数应该怎么测？"}]}}}
+{"type":"user/message","seq":3,"time":1700000003000,"data":{"message":{"id":"u0","role":"user","source":{"kind":"runtime-context"},"content":"RUNTIME CONTEXT: this is injected, not the person speaking."}}}
+{"type":"assistant/message","seq":4,"time":1700000004000,"data":{"turn":1,"step":1,"message":{"id":"a1","role":"assistant","content":[{"type":"reasoning","text":"先拆输入输出。"},{"type":"text","text":"先写一个最小用例，再补边界。"}]}}}
+{"type":"tool/call","seq":5,"time":1700000004500,"data":{"callId":"c1","name":"read_file"}}
+{"type":"tool/result","seq":6,"time":1700000005000,"data":{"toolCallId":"c1","message":{"content":[{"type":"text","text":"file contents"}]}}}

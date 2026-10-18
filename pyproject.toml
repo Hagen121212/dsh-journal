@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dsh-journal"
+version = "0.1.0"
+description = "把 DeepSeek Harness 的本地会话变成可回看的“思维年轮”：会话卡、周报、双周成长复盘，所有判断都能回链原话。"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "dsh-journal contributors" }]
+keywords = ["deepseek", "dsh", "journal", "reflection", "local-first", "sqlite"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: End Users/Desktop",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Text Processing :: Linguistic",
+]
+
+[project.scripts]
+journal = "journal.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["journal*"]
+namespaces = false
+
+[tool.setuptools.package-data]
+journal = ["*.txt"]
