@@ -34,6 +34,7 @@ from journal.db import (  # noqa: E402
     save_report,
     start_run,
     upsert_session,
+    replace_messages,
 )
 from journal.l4 import render_l4_md  # noqa: E402
 from journal.report_md import render_growth_md, render_weekly_md  # noqa: E402
@@ -167,7 +168,7 @@ def _insert_reports(cfg: Config, conn, dataset: dict) -> None:
         elif kind in ("growth", "baseline"):
             baseline = kind == "baseline"
             data["period"] = {"start": start, "end": end, "baseline": baseline}
-            data["cards"] = [c for c in cards if True]
+            data["cards"] = list(cards)
             md = render_growth_md(data, title=title, baseline=baseline)
             folder = cfg.reports_dir / ("baseline" if baseline else "growth")
             name = f"{end}.md"
@@ -200,14 +201,7 @@ def build(home: Path, dataset_path: Path = DATASET, clean: bool = False) -> dict
     for session in dataset["sessions"]:
         row, messages = _session_rows(session)
         upsert_session(conn, row)
-        conn.execute("DELETE FROM messages WHERE session_id=?", (session["id"],))
-        conn.executemany(
-            """INSERT INTO messages(id, session_id, source_id, seq, block_index, role, kind, content,
-            ts_ms, local_date, turn, step, tool_name, tool_call_id, meta_json)
-            VALUES(:id, :session_id, :source_id, :seq, :block_index, :role, :kind, :content,
-            :ts_ms, :local_date, :turn, :step, :tool_name, :tool_call_id, :meta_json)""",
-            messages,
-        )
+        replace_messages(conn, session["id"], messages)
         save_card(conn, session["id"], _clean_card(session["card"]), row["model"], "v1")
         link_session_topics(conn, session["id"], session.get("topics") or [])
         conn.commit()
