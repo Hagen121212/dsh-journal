@@ -88,7 +88,12 @@ export DEEPSEEK_API_KEY=sk-...          # Windows: set DEEPSEEK_API_KEY=...
 python -m journal.cli backfill --force
 ```
 
-这一步会：同步历史会话 → 生成会话卡 → 生成基线画像 → 为已完成的历史周各生成一份周报。会产生 API 费用，先用 `--limit` 或先在少量会话上试。
+这一步会：同步历史会话 → 生成会话卡 → 生成基线画像 → 为已完成的历史周各生成一份周报。会产生 API 费用。想先看效果，可以只跑前两步的少量样本：
+
+```bash
+python -m journal.cli sync --limit 3
+python -m journal.cli cards --limit 3
+```
 
 ### 打开网页
 
@@ -115,9 +120,10 @@ python -m journal.cli l4         # 导出 L4 档案
 Windows：把 `run_weekly.cmd` 挂到任务计划程序，每周日 20:00。
 
 ```powershell
-schtasks /Create /TN "DSH Journal Weekly" /SC WEEKLY /D SUN /ST 20:00 ^
-  /TR "\"C:\path\to\dsh-journal\run_weekly.cmd\"" /F
+schtasks /Create /TN "DSH Journal Weekly" /SC WEEKLY /D SUN /ST 20:00 /TR "C:\path\to\dsh-journal\run_weekly.cmd" /F
 ```
+
+任务默认是“仅交互式运行”，需要你处于登录状态；错过时间且当时已登录时会在可用时补跑。
 
 macOS / Linux：一行 cron。
 
@@ -219,7 +225,7 @@ JOURNAL_HOME=demo-home python -m journal.cli serve --port 8766
 
 - 只解析 DSH 的 `session.v4.jsonl.zstd` 会话格式；DSH 改格式时需要跟进。
 - 报告质量取决于模型；引用校验能拦住“编造原话”，但拦不住“引用真实、解读过度”。所以 L4 必须由你确认。
-- 首次全量回填的 token 消耗与历史长度成正比，建议先 `--limit` 试跑。
+- 首次全量回填的 token 消耗与历史长度成正比，建议先 `sync --limit 3` + `cards --limit 3` 试跑。
 - 没有多用户、同步、移动端；它是一个本地单人工具。
 - 面板插件依赖 DSH 内部注入点，属于非官方集成。
 
