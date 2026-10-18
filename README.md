@@ -73,7 +73,7 @@
 ### 运行
 
 ```bash
-git clone <this-repo> dsh-journal
+git clone https://github.com/Hagen121212/dsh-journal.git
 cd dsh-journal
 cp config.example.toml config.toml      # 可选，默认值已够用
 python -m journal.cli status            # 看能否找到 ~/.dsh/sessions
