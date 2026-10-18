@@ -18,6 +18,9 @@ FACT.md
 .edge-profile/
 .tools/
 docs/frames/
+docs/frames-hd/
+docs/video-build/
+docs/video-check.png
 tests/_tmp/
 __pycache__/
 *.py[cod]
